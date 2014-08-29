@@ -192,7 +192,7 @@ int is_files_equal(char *f1, char *f2, size_t size)
 	return !ret;
 }
 
-int crc(unsigned short *crc, struct list_entry *list)
+int crc_calc(unsigned short *crc, struct list_entry *list)
 {
 	void *fm;
 	int fd, size;
@@ -224,7 +224,7 @@ int push_to_crc_list(struct crc_entry* *hash_list, struct list_entry *list)
 	}
 	new_ent->name = list->name;
 	new_ent->next = *hash_list;
-	if(crc(&new_ent->crc, list)) {
+	if(crc_calc(&new_ent->crc, list)) {
 		free(new_ent);
 		return 0;
 	}		
@@ -317,7 +317,7 @@ void file_comparisons(struct list_entry *l)
 			}
 			first->name = l->name;
 			first->next = NULL;
-			crc(&first->crc, l);
+			crc_calc(&first->crc, l);
 			hl = &first;
 			while(NULL != sf && l->size == sf->size) {
 				if(push_to_crc_list(hl, sf)) {
