@@ -369,15 +369,17 @@ int	file_dup_find(char *dir, unsigned long min_size)
 int	main(int argc, char *argv[])
 {
 	int str_end;
-	unsigned long min_size = 0;
+	unsigned long min_size = 1;
 
 	if (argc < 2 || argc > 3) {
 		printf("Use: %s <Directory> [Minimal File size]\n", argv[0]);
 		return 0;
 	}
 
-	if(argc > 2) {
+	if (argc > 2) {
 		min_size = atoi(argv[2]);
+		if (min_size < 1)
+			min_size = 1;
 	}
 	str_end = strlen(argv[1]) - 1;
 	if (argv[1][str_end] == '/')
