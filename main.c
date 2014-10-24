@@ -70,7 +70,7 @@ int	scan_dir(char *dir_name, unsigned long min_size, int(*list_cb)(struct list_e
 	
 	dir = opendir(dir_name);
 
-	if (dir == NULL) {
+	if (NULL == dir) {
 		printf("Error reading of directory %s\n", dir_name);
 		return ERR_READ_DIR;
 	}
@@ -113,8 +113,8 @@ int insert_file_entry(struct list_entry *list, char *name, unsigned long size)
 	strcpy(n->name, name);
 	n->size = size;
 
-	for(; list != NULL; list = list->next){
-		if (list->next != NULL) {
+	for(; list; list = list->next){
+		if (list->next) {
 			if (size < list->size) {		// TODO: check if need
 				printf("-- find next size %lu\n", size);
 				continue;
@@ -147,9 +147,9 @@ void clean_malloc(struct list_entry *list)
 {
 	struct list_entry *tmp, *tmpd;
 
-	while (list != NULL) {
+	while (list) {
 		tmpd = list->next_down;
-		while(NULL != tmpd) {			
+		while(tmpd) {
 			tmp = tmpd;
 			tmpd = tmpd->next_down;
 			free(tmp);
@@ -162,10 +162,10 @@ void clean_malloc(struct list_entry *list)
 
 void unmap_and_close(struct list_entry *list)
 {
-	for (; list != NULL; list = list->next_down) {
-		if (NULL != list->mm)
+	for (; list; list = list->next_down) {
+		if (list->mm)
 			munmap(list->mm, list->size);
-		if (0 != list->fd)
+		if (list->fd)
 			close(list->fd);
 	}
 }
@@ -250,10 +250,10 @@ void do_crc_comparisons(struct list_entry *list)
 	unsigned long size = list->size;
 	struct list_entry *first, *sec;
 
-	for(first = list; NULL != first && NULL != first->next_down; first = first->next_down) {
+	for(first = list; first && first->next_down; first = first->next_down) {
 		if (0 == first->size)
 			continue;
-		for(sec = first->next_down; sec != NULL; sec = sec->next_down) {
+		for(sec = first->next_down; sec; sec = sec->next_down) {
 			if(0 == sec->size || first->crc != sec->crc)
 				continue;
 			files_eq = !memcmp(first->mm, sec->mm, size);
@@ -277,7 +277,7 @@ void file_comparisons(struct list_entry **list)
 {
 	struct list_entry *l = *list, *used = NULL, *dl;	/* down list */
 
-	for(;NULL != l; l = l->next) {
+	for(; l; l = l->next) {
 		*list = l;
 		while(used) {
 			struct list_entry *tmp = used;
@@ -298,7 +298,7 @@ void file_comparisons(struct list_entry **list)
 			* For this case first calculate CRC of each file part,
 			* then the files is compared if CRC is equal.
 			*/
-			for(dl = l; NULL != dl; dl = dl->next_down)
+			for(dl = l; dl; dl = dl->next_down)
 				crc_calc(dl);
 			do_crc_comparisons(l);
 			unmap_and_close(l);
