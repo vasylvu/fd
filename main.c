@@ -115,11 +115,7 @@ int insert_file_entry(struct list_entry *list, char *name, unsigned long size)
 
 	for(; list; list = list->next){
 		if (list->next) {
-			if (size < list->size) {		// TODO: check if need
-				printf("-- find next size %lu\n", size);
-				continue;
-			}
-			else if (size > list->size && size < list->next->size) {
+			if (size > list->size && size < list->next->size) {
 				n->next = list->next;
 				n->next_down = NULL;
 				list->next = n;
