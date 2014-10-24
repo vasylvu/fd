@@ -273,11 +273,19 @@ void do_crc_comparisons(struct list_entry *list)
 	}
 }
 
-void file_comparisons(struct list_entry *l)
+void file_comparisons(struct list_entry **list)
 {
-	struct list_entry *dl;	/* down list */
+	struct list_entry *l = *list, *used = NULL, *dl;	/* down list */
 
 	for(;NULL != l; l = l->next) {
+		*list = l;
+		while(used) {
+			struct list_entry *tmp = used;
+			used = used->next_down;
+			free(tmp);
+		}
+		used = l;
+
 		if(NULL == l->next_down) {
 			continue;
 		}
@@ -314,7 +322,7 @@ int	file_dup_find(char *dir, unsigned long min_size)
 	printf("Scanning files...\n");
 	scan_dir(dir, min_size, insert_file_entry, list);
 	printf("\nStarting comparisons...\n");
-	file_comparisons(list);
+	file_comparisons(&list);
 	printf("%d files scanned, %d file(s) failed.\n", files_scanned(), files_failed());
 	clean_malloc(list);
 	return 0;
